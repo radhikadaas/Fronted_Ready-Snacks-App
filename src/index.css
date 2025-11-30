@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #0f172a; /* matches bg-gray-900 */
+}
