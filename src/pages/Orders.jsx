@@ -1,12 +1,16 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import OrderStatusBadge from "../components/OrderStatusBadge";
+import { formatIST } from "../../utils/date";
 
 export default function Orders() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [orders, setOrders] = useState([]);
+
+  
 
   useEffect(() => {
     async function load() {
@@ -27,15 +31,21 @@ export default function Orders() {
     return "ORD-" + id.slice(0, 5);
   }
 
-  function formatDate(d) {
-    return new Date(d).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+//   function formatDateUTC(dateString) {
+//   const date = new Date(dateString);
+
+//   const options = {
+//     day: "2-digit",
+//     month: "2-digit",
+//     year: "numeric",
+//     hour: "numeric",
+//     minute: "2-digit",
+//     hour12: true,
+//   };
+
+//   return new Intl.DateTimeFormat("en-IN", options).format(date);
+// }
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-10">
@@ -103,7 +113,7 @@ export default function Orders() {
               <div className="mb-4">
                 <p className="font-bold text-lg">Total: ₹{o.total}</p>
                 <p className="text-gray-300 text-sm">
-                  Date: {formatDate(o.created_at)}
+                  Date: {formatIST(o.created_at)}
                 </p>
               </div>
 

@@ -27,11 +27,9 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
 
-        {/* GLOBAL NAVBAR — only rendered once */}
         <Navbar />
 
-        {/* MAIN CONTENT (auto spacing handled by pages individually) */}
-        <main className="pt-10"> 
+        <main className="pt-10">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<Product />} />
@@ -58,7 +56,16 @@ function App() {
 
             <Route path="/orders/:id" element={<OrderDetails />} />
 
-            <Route path="/profile" element={<Profile />} />
+            {/* 🔥 PROTECTED PROFILE PAGE */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="/login" element={<Login />} />
 
             <Route
@@ -109,5 +116,4 @@ function App() {
 }
 
 export default App;
-
 

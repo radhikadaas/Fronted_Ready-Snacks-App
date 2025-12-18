@@ -1,9 +1,13 @@
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Spinner } from "flowbite-react";
 
 export default function Checkout() {
   const { cart } = useCart();
   const navigate = useNavigate();
+
+  const [loadingPayment, setLoadingPayment] = useState(false); // 🔥 NEW
 
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
@@ -15,7 +19,10 @@ export default function Checkout() {
     );
 
   function handleProceed() {
-    navigate("/payment");
+    setLoadingPayment(true);
+
+    // Smooth delay before routing
+    setTimeout(() => navigate("/payment"), 600);
   }
 
   return (
@@ -26,11 +33,13 @@ export default function Checkout() {
         <h1 className="text-4xl font-bold">Checkout</h1>
 
         {/* ⭐ ORDER SUMMARY CARD */}
-        <div className="
-          bg-white/10 backdrop-blur-lg 
-          p-6 rounded-2xl shadow-xl 
-          border border-white/10
-        ">
+        <div
+          className="
+            bg-white/10 backdrop-blur-lg 
+            p-6 rounded-2xl shadow-xl 
+            border border-white/10
+          "
+        >
           <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
 
           <div className="space-y-4">
@@ -59,17 +68,28 @@ export default function Checkout() {
           </div>
         </div>
 
-        {/* ⭐ PROCEED BUTTON */}
+        {/* ⭐ PROCEED BUTTON WITH BEAUTIFUL LOADER */}
         <button
           onClick={handleProceed}
-          className="
-            w-full py-3 rounded-xl 
-            text-lg font-semibold 
-            bg-indigo-500 hover:bg-indigo-400 
-            text-white shadow-md transition
-          "
+          disabled={loadingPayment}
+          className={`
+            w-full py-3 rounded-xl text-lg font-semibold shadow-lg transition-all duration-300
+            flex items-center justify-center gap-2
+            ${loadingPayment
+              ? "bg-linear-to-r from-indigo-500 to-purple-500 cursor-not-allowed scale-95 shadow-indigo-500/50"
+              : "bg-indigo-500 hover:bg-indigo-400 text-white hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105"}
+          `}
         >
-          Proceed to Payment →
+          {loadingPayment ? (
+            <>
+              <Spinner size="sm" light />
+              <span className="animate-pulse">Processing Payment...</span>
+            </>
+          ) : (
+            <span className="transition-transform group-hover:translate-x-1">
+              Proceed to Payment →
+            </span>
+          )}
         </button>
       </div>
     </div>

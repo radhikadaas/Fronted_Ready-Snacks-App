@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchProductById } from "../lib/supabaseClient";
-import { Card } from "flowbite-react";
+import { Card, Spinner } from "flowbite-react";
 
 export default function Product() {
   const { id } = useParams();
@@ -12,6 +12,7 @@ export default function Product() {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
+  const [loadingBtn, setLoadingBtn] = useState(false); // 🔥 NEW
 
   useEffect(() => {
     async function load() {
@@ -54,7 +55,10 @@ export default function Product() {
 
           {/* Add to Cart Button */}
           <button
+            disabled={loadingBtn}
             onClick={() => {
+              setLoadingBtn(true);
+
               addToCart({
                 id: product.id,
                 name: product.name,
@@ -64,21 +68,33 @@ export default function Product() {
 
               toast.success(`${product.name} added to cart!`);
 
-              setTimeout(() => navigate("/cart"), 800);
+              setTimeout(() => {
+                navigate("/cart");
+              }, 500);
             }}
-            className="
+            className={`
               w-full mt-4 py-2.5 rounded-lg
-              bg-indigo-600 hover:bg-indigo-500 
               text-white text-base font-semibold
-              active:scale-95 transition-transform
-            "
+              flex justify-center items-center gap-2
+              transition-all duration-300 ease-in-out
+              transform hover:scale-105 active:scale-95
+              ${loadingBtn 
+                ? "bg-linear-to-r from-indigo-500 to-purple-600 cursor-not-allowed shadow-lg shadow-indigo-500/50" 
+                : "bg-linear-to-r from-indigo-600 to-purple-700 hover:shadow-lg hover:shadow-indigo-500/50"
+              }
+            `}
           >
-            Add to Cart
+            {loadingBtn ? (
+              <>
+                <Spinner size="sm" light className="animate-spin" />
+                <span className="animate-pulse">Processing...</span>
+              </>
+            ) : (
+              "🛒 Add to Cart"
+            )}
           </button>
         </Card>
       </div>
     </div>
   );
 }
-
-

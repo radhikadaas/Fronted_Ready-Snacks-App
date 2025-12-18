@@ -10,24 +10,24 @@ export default function AdminOrderDetail() {
   useEffect(() => {
     supabase
       .from("orders")
-      .select("*")
+      .select("*") // ✅ No join; using user_email saved in table
       .eq("id", id)
       .single()
       .then(({ data }) => setOrder(data));
   }, [id]);
 
-  async function updateStatus(newStatus) {
+  async function updateField(field, value) {
     const { error } = await supabase
       .from("orders")
-      .update({ order_status: newStatus })
+      .update({ [field]: value })
       .eq("id", id);
 
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Status updated");
-      setOrder({ ...order, order_status: newStatus });
-    }
+    if (error) alert(error.message);
+    else setOrder({ ...order, [field]: value });
+  }
+
+  function updateStatus(newStatus) {
+    updateField("order_status", newStatus);
   }
 
   if (!order)
@@ -73,9 +73,27 @@ export default function AdminOrderDetail() {
               </span>
             </p>
 
+            {/* Payment Status Buttons */}
+            <div className="flex gap-3 mt-3">
+              <button
+                onClick={() => updateField("payment_status", "paid")}
+                className="px-4 py-2 rounded bg-green-600 hover:bg-green-500"
+              >
+                Mark Paid
+              </button>
+              <button
+                onClick={() => updateField("payment_status", "unpaid")}
+                className="px-4 py-2 rounded bg-red-600 hover:bg-red-500"
+              >
+                Mark Unpaid
+              </button>
+            </div>
+
             <p>
               <span className="font-semibold text-white">Delivery Type:</span>{" "}
-              {order.delivery_type === "pickup" ? "Self Pickup" : "Home Delivery"}
+              {order.delivery_type === "pickup"
+                ? "Self Pickup"
+                : "Home Delivery"}
             </p>
 
             <p className="font-semibold text-lg text-green-400">
@@ -83,7 +101,7 @@ export default function AdminOrderDetail() {
             </p>
           </div>
 
-          {/* ADDRESS (IF DELIVERY) */}
+          {/* DELIVERY ADDRESS */}
           {order.delivery_type === "delivery" && order.address && (
             <div className="bg-white/5 p-5 rounded-xl border border-white/10 mt-4">
               <h3 className="text-xl font-semibold mb-3">Delivery Address</h3>
@@ -98,7 +116,7 @@ export default function AdminOrderDetail() {
             </div>
           )}
 
-          {/* STATUS UPDATE */}
+          {/* ORDER STATUS WORKFLOW */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold">Update Status</h3>
 
@@ -124,9 +142,37 @@ export default function AdminOrderDetail() {
             </div>
           </div>
 
+          {/* DELIVERY CHARGE */}
+          <div className="bg-white/5 p-5 rounded-xl border border-white/10 mt-6">
+            <h3 className="text-xl font-bold mb-3">Delivery Charge</h3>
+
+            <div className="flex gap-3">
+              <input
+                type="number"
+                className="p-2 rounded bg-gray-800 border border-white/20 w-32"
+                value={order.delivery_charge_cents || 0}
+                onChange={(e) =>
+                  setOrder({
+                    ...order,
+                    delivery_charge_cents: Number(e.target.value),
+                  })
+                }
+              />
+
+              <button
+                onClick={() =>
+                  updateField("delivery_charge_cents", order.delivery_charge_cents)
+                }
+                className="px-4 py-2 rounded bg-green-600 hover:bg-green-500"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+
         </div>
 
-        {/* ITEMS LIST */}
+        {/* ITEMS */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/10 shadow-xl p-8">
           <h3 className="text-2xl font-bold mb-4">Items</h3>
 
@@ -159,4 +205,5 @@ export default function AdminOrderDetail() {
     </div>
   );
 }
+
 

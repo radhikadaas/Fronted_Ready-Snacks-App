@@ -1,8 +1,13 @@
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Spinner } from "flowbite-react";
 
 export default function Cart() {
   const { cart, updateQty, removeItem } = useCart();
+  const navigate = useNavigate();
+
+  const [loadingCheckout, setLoadingCheckout] = useState(false); // 🔥 NEW
 
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
@@ -77,19 +82,39 @@ export default function Cart() {
           ))}
         </div>
 
-        {/* TOTAL */}
+        {/* TOTAL + CHECKOUT BUTTON */}
         <div className="mt-8 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 shadow-lg">
           <h2 className="text-2xl font-semibold mb-2">Order Summary</h2>
           <p className="text-lg font-medium text-gray-300">
             Total: <span className="text-white font-bold">₹{total}</span>
           </p>
 
-          <Link
-            to="/checkout"
-            className="block mt-5 w-full text-center py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white font-semibold transition"
+          {/* 🔥 ANIMATED BUTTON WITH LOADER */}
+          <button
+            onClick={() => {
+              setLoadingCheckout(true);
+              setTimeout(() => navigate("/checkout"), 500);
+            }}
+            disabled={loadingCheckout}
+            className={`
+              mt-5 w-full py-3 rounded-lg font-semibold
+              flex items-center justify-center gap-2 transition-all duration-300
+              ${loadingCheckout
+                ? "bg-indigo-600 cursor-not-allowed shadow-lg shadow-indigo-500/50 scale-[0.98]"
+                : "bg-indigo-500 hover:bg-indigo-400 hover:shadow-lg hover:shadow-indigo-500/50 text-white active:scale-95"}
+            `}
           >
-            Proceed to Checkout →
-          </Link>
+            {loadingCheckout ? (
+              <>
+                <div className="animate-spin">
+                  <Spinner size="sm" light color="white" />
+                </div>
+                <span className="animate-pulse">Processing Order...</span>
+              </>
+            ) : (
+              "Proceed to Checkout →"
+            )}
+          </button>
         </div>
       </div>
     </div>
