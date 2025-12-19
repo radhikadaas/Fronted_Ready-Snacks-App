@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
+import { HiLocationMarker } from "react-icons/hi";
 
 export default function AdminOrderDetail() {
   const { id } = useParams();
@@ -10,7 +11,7 @@ export default function AdminOrderDetail() {
   useEffect(() => {
     supabase
       .from("orders")
-      .select("*") // ✅ No join; using user_email saved in table
+      .select("*")
       .eq("id", id)
       .single()
       .then(({ data }) => setOrder(data));
@@ -38,12 +39,15 @@ export default function AdminOrderDetail() {
     );
 
   const shortId = order.id.slice(0, 6).toUpperCase();
+  const isPickup = order.delivery_type === "pickup";
+  const addr = order.address || {};
+  const pickup = order.pickup_location || null;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-10 flex justify-center">
       <div className="w-full max-w-3xl space-y-10">
 
-        {/* HEADER */}
+        {/* HEADER CARD */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/10 shadow-xl p-8 space-y-6">
 
           <div className="flex items-center justify-between">
@@ -53,7 +57,43 @@ export default function AdminOrderDetail() {
             <OrderStatusBadge status={order.order_status} />
           </div>
 
-          {/* USER INFO */}
+          {/* 📍 PICKUP MAP STRIP */}
+          {isPickup && pickup?.map_link && (
+            <a
+              href={pickup.map_link}
+              target="_blank"
+              rel="noreferrer"
+              className="group block p-4 rounded-xl border border-indigo-400/30
+                         bg-indigo-500/10 hover:bg-indigo-500/20
+                         transition-all hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-indigo-600/20 text-indigo-400
+                                group-hover:scale-110 transition">
+                  <HiLocationMarker className="w-6 h-6" />
+                </div>
+
+                <div className="flex-1">
+                  <p className="text-sm text-indigo-300 font-semibold">
+                    Pickup Warehouse Location
+                  </p>
+                  <p className="font-semibold text-white">
+                    {pickup.title}
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    {pickup.address}
+                  </p>
+                </div>
+
+                <span className="text-sm text-indigo-300 opacity-0
+                                 group-hover:opacity-100 transition">
+                  Open Maps →
+                </span>
+              </div>
+            </a>
+          )}
+
+          {/* USER + PAYMENT INFO */}
           <div className="space-y-2 text-gray-300">
             <p>
               <span className="font-semibold text-white">User:</span>{" "}
@@ -73,7 +113,7 @@ export default function AdminOrderDetail() {
               </span>
             </p>
 
-            {/* Payment Status Buttons */}
+            {/* PAYMENT STATUS CONTROLS */}
             <div className="flex gap-3 mt-3">
               <button
                 onClick={() => updateField("payment_status", "paid")}
@@ -91,9 +131,7 @@ export default function AdminOrderDetail() {
 
             <p>
               <span className="font-semibold text-white">Delivery Type:</span>{" "}
-              {order.delivery_type === "pickup"
-                ? "Self Pickup"
-                : "Home Delivery"}
+              {isPickup ? "Self Pickup" : "Home Delivery"}
             </p>
 
             <p className="font-semibold text-lg text-green-400">
@@ -102,16 +140,41 @@ export default function AdminOrderDetail() {
           </div>
 
           {/* DELIVERY ADDRESS */}
-          {order.delivery_type === "delivery" && order.address && (
+          {!isPickup && order.address && (
             <div className="bg-white/5 p-5 rounded-xl border border-white/10 mt-4">
               <h3 className="text-xl font-semibold mb-3">Delivery Address</h3>
               <div className="space-y-1 text-gray-300">
-                <p><b>Name:</b> {order.address.name}</p>
-                <p><b>Phone:</b> {order.address.phone}</p>
-                <p><b>Address 1:</b> {order.address.line1}</p>
-                <p><b>Address 2:</b> {order.address.line2}</p>
-                <p><b>City:</b> {order.address.city}</p>
-                <p><b>Pincode:</b> {order.address.pincode}</p>
+                <p><b>Name:</b> {addr.name}</p>
+                <p><b>Phone:</b> {addr.phone}</p>
+                <p><b>Address 1:</b> {addr.line1}</p>
+                <p><b>Address 2:</b> {addr.line2}</p>
+                <p><b>City:</b> {addr.city}</p>
+                <p><b>Pincode:</b> {addr.pincode}</p>
+              </div>
+            </div>
+          )}
+
+          {/* PICKUP DETAILS */}
+          {isPickup && pickup && (
+            <div className="bg-indigo-500/10 p-5 rounded-xl border border-indigo-400/30 mt-4">
+              <h3 className="text-xl font-semibold mb-3 text-indigo-300">
+                Pickup Details
+              </h3>
+
+              <div className="space-y-2 text-gray-200">
+                <p><b>Name:</b> {addr.name}</p>
+                <p><b>Phone:</b> {addr.phone}</p>
+                <p><b>Alternate Phone:</b> {addr.alternate_phone || "—"}</p>
+
+                <div className="pt-3 space-y-1">
+                  <p className="font-semibold text-indigo-400">
+                    Warehouse
+                  </p>
+                  <p><b>Building:</b> {pickup.title}</p>
+                  <p><b>Address:</b> {pickup.address}</p>
+                  <p><b>Shop Phone:</b> {pickup.contact_phone}</p>
+                  <p><b>Alternate:</b> {pickup.alternate_phone || "—"}</p>
+                </div>
               </div>
             </div>
           )}
@@ -126,14 +189,11 @@ export default function AdminOrderDetail() {
                   <button
                     key={s}
                     onClick={() => updateStatus(s)}
-                    className={`
-                      w-full px-4 py-2 rounded-lg font-semibold transition
-                      ${
-                        order.order_status === s
-                          ? "bg-gray-600 cursor-default"
-                          : "bg-indigo-600 hover:bg-indigo-500 shadow"
-                      }
-                    `}
+                    className={`w-full px-4 py-2 rounded-lg font-semibold transition ${
+                      order.order_status === s
+                        ? "bg-gray-600 cursor-default"
+                        : "bg-indigo-600 hover:bg-indigo-500 shadow"
+                    }`}
                   >
                     Mark as {s.replace("_", " ")}
                   </button>
@@ -169,7 +229,6 @@ export default function AdminOrderDetail() {
               </button>
             </div>
           </div>
-
         </div>
 
         {/* ITEMS */}
@@ -200,10 +259,8 @@ export default function AdminOrderDetail() {
             Final Total: ₹{order.total}
           </p>
         </div>
-
       </div>
     </div>
   );
 }
-
 
