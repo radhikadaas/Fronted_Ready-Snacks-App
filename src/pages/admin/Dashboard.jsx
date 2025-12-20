@@ -35,7 +35,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-5xl mx-auto space-y-8">
-
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Admin Dashboard</h1>
 
@@ -44,6 +43,13 @@ export default function Dashboard() {
             className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 transition shadow"
           >
             Admin Orders
+          </Link>
+          
+          <Link
+            to="/admin/pickup-locations"
+            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition shadow"
+          >
+            Pickup Locations
           </Link>
         </div>
 
@@ -84,10 +90,7 @@ export default function Dashboard() {
 
               <tbody className="divide-y divide-white/10">
                 {products.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="hover:bg-white/5 transition"
-                  >
+                  <tr key={p.id} className="hover:bg-white/5 transition">
                     <td className="p-3">
                       <img
                         src={p.image}
@@ -124,5 +127,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-

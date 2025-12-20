@@ -46,10 +46,8 @@ export default function AdminOrderDetail() {
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-10 flex justify-center">
       <div className="w-full max-w-3xl space-y-10">
-
         {/* HEADER CARD */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/10 shadow-xl p-8 space-y-6">
-
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold">
               Order <span className="text-indigo-400">#{shortId}</span>
@@ -68,8 +66,10 @@ export default function AdminOrderDetail() {
                          transition-all hover:-translate-y-0.5"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-600/20 text-indigo-400
-                                group-hover:scale-110 transition">
+                <div
+                  className="p-2 rounded-lg bg-indigo-600/20 text-indigo-400
+                                group-hover:scale-110 transition"
+                >
                   <HiLocationMarker className="w-6 h-6" />
                 </div>
 
@@ -77,16 +77,51 @@ export default function AdminOrderDetail() {
                   <p className="text-sm text-indigo-300 font-semibold">
                     Pickup Warehouse Location
                   </p>
-                  <p className="font-semibold text-white">
-                    {pickup.title}
+                  <p className="font-semibold text-white">{pickup.title}</p>
+                  <p className="text-sm text-gray-300">{pickup.address}</p>
+                </div>
+
+                <span
+                  className="text-sm text-indigo-300 opacity-0
+                                 group-hover:opacity-100 transition"
+                >
+                  Open Maps →
+                </span>
+              </div>
+            </a>
+          )}
+
+          {/* 📍 CURRENT DELIVERY LOCATION */}
+          {!isPickup && order?.delivery_location && (
+            <a
+              href={order.delivery_location}
+              target="_blank"
+              rel="noreferrer"
+              className="group block p-4 rounded-xl border border-green-400/30 
+               bg-green-500/10 hover:bg-green-500/20 
+               transition-all hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="p-2 rounded-lg bg-green-600/20 text-green-400 
+                   group-hover:scale-110 transition"
+                >
+                  <HiLocationMarker className="w-6 h-6" />
+                </div>
+
+                <div className="flex-1">
+                  <p className="text-sm text-green-300 font-semibold">
+                    Delivery Location
                   </p>
                   <p className="text-sm text-gray-300">
-                    {pickup.address}
+                    Tap to open in Google Maps
                   </p>
                 </div>
 
-                <span className="text-sm text-indigo-300 opacity-0
-                                 group-hover:opacity-100 transition">
+                <span
+                  className="text-sm text-green-300 opacity-0 
+                   group-hover:opacity-100 transition"
+                >
                   Open Maps →
                 </span>
               </div>
@@ -144,12 +179,24 @@ export default function AdminOrderDetail() {
             <div className="bg-white/5 p-5 rounded-xl border border-white/10 mt-4">
               <h3 className="text-xl font-semibold mb-3">Delivery Address</h3>
               <div className="space-y-1 text-gray-300">
-                <p><b>Name:</b> {addr.name}</p>
-                <p><b>Phone:</b> {addr.phone}</p>
-                <p><b>Address 1:</b> {addr.line1}</p>
-                <p><b>Address 2:</b> {addr.line2}</p>
-                <p><b>City:</b> {addr.city}</p>
-                <p><b>Pincode:</b> {addr.pincode}</p>
+                <p>
+                  <b>Name:</b> {addr.name}
+                </p>
+                <p>
+                  <b>Phone:</b> {addr.phone}
+                </p>
+                <p>
+                  <b>Address 1:</b> {addr.line1}
+                </p>
+                <p>
+                  <b>Address 2:</b> {addr.line2}
+                </p>
+                <p>
+                  <b>City:</b> {addr.city}
+                </p>
+                <p>
+                  <b>Pincode:</b> {addr.pincode}
+                </p>
               </div>
             </div>
           )}
@@ -162,18 +209,30 @@ export default function AdminOrderDetail() {
               </h3>
 
               <div className="space-y-2 text-gray-200">
-                <p><b>Name:</b> {addr.name}</p>
-                <p><b>Phone:</b> {addr.phone}</p>
-                <p><b>Alternate Phone:</b> {addr.alternate_phone || "—"}</p>
+                <p>
+                  <b>Name:</b> {addr.name}
+                </p>
+                <p>
+                  <b>Phone:</b> {addr.phone}
+                </p>
+                <p>
+                  <b>Alternate Phone:</b> {addr.alternate_phone || "—"}
+                </p>
 
                 <div className="pt-3 space-y-1">
-                  <p className="font-semibold text-indigo-400">
-                    Warehouse
+                  <p className="font-semibold text-indigo-400">Warehouse</p>
+                  <p>
+                    <b>Building:</b> {pickup.title}
                   </p>
-                  <p><b>Building:</b> {pickup.title}</p>
-                  <p><b>Address:</b> {pickup.address}</p>
-                  <p><b>Shop Phone:</b> {pickup.contact_phone}</p>
-                  <p><b>Alternate:</b> {pickup.alternate_phone || "—"}</p>
+                  <p>
+                    <b>Address:</b> {pickup.address}
+                  </p>
+                  <p>
+                    <b>Shop Phone:</b> {pickup.contact_phone}
+                  </p>
+                  <p>
+                    <b>Alternate:</b> {pickup.alternate_phone || "—"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -184,21 +243,25 @@ export default function AdminOrderDetail() {
             <h3 className="text-xl font-bold">Update Status</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {["ordered", "in_process", "shipped", "delivered", "cancelled"].map(
-                (s) => (
-                  <button
-                    key={s}
-                    onClick={() => updateStatus(s)}
-                    className={`w-full px-4 py-2 rounded-lg font-semibold transition ${
-                      order.order_status === s
-                        ? "bg-gray-600 cursor-default"
-                        : "bg-indigo-600 hover:bg-indigo-500 shadow"
-                    }`}
-                  >
-                    Mark as {s.replace("_", " ")}
-                  </button>
-                )
-              )}
+              {[
+                "ordered",
+                "in_process",
+                "shipped",
+                "delivered",
+                "cancelled",
+              ].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => updateStatus(s)}
+                  className={`w-full px-4 py-2 rounded-lg font-semibold transition ${
+                    order.order_status === s
+                      ? "bg-gray-600 cursor-default"
+                      : "bg-indigo-600 hover:bg-indigo-500 shadow"
+                  }`}
+                >
+                  Mark as {s.replace("_", " ")}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -221,7 +284,10 @@ export default function AdminOrderDetail() {
 
               <button
                 onClick={() =>
-                  updateField("delivery_charge_cents", order.delivery_charge_cents)
+                  updateField(
+                    "delivery_charge_cents",
+                    order.delivery_charge_cents
+                  )
                 }
                 className="px-4 py-2 rounded bg-green-600 hover:bg-green-500"
               >
@@ -263,4 +329,3 @@ export default function AdminOrderDetail() {
     </div>
   );
 }
-

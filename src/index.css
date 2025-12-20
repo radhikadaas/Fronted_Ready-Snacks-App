@@ -5,3 +5,28 @@ html, body {
   padding: 0 !important;
   background: #0f172a; /* matches bg-gray-900 */
 }
+
+.input {
+  width: 100%;
+  background: #1f2937;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
