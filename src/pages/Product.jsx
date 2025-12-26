@@ -4,28 +4,7 @@ import { useCart } from "../context/CartContext";
 import toast from "react-hot-toast";
 import { fetchProductById } from "../lib/supabaseClient";
 import { Card, Spinner } from "flowbite-react";
-
-/* ---------------- BADGE ---------------- */
-function Badge({ type, value }) {
-  const base = "px-2 py-1 text-xs font-semibold rounded-md";
-
-  switch (type) {
-    case "new":
-      return <span className={`${base} bg-blue-600`}>NEW</span>;
-    case "best_seller":
-      return <span className={`${base} bg-orange-600`}>Best Seller</span>;
-    case "chef_choice":
-      return (
-        <span className={`${base} bg-purple-600`}>👨‍🍳 Ghar Ka Favorite</span>
-      );
-    case "discount":
-      return <span className={`${base} bg-red-700`}>{value}% OFF</span>;
-    case "limited_deal":
-      return <span className={`${base} bg-red-600`}>⏳ Limited Time Deal</span>;
-    default:
-      return null;
-  }
-}
+import ProductBadges from "../components/product/ProductBadges";
 
 export default function Product() {
   const { id } = useParams();
@@ -39,8 +18,13 @@ export default function Product() {
     fetchProductById(id).then(setProduct);
   }, [id]);
 
-  if (!product)
-    return <h1 className="text-center mt-10 text-white">Product not found</h1>;
+  if (!product) {
+    return (
+      <h1 className="text-center mt-10 text-white">
+        Product not found
+      </h1>
+    );
+  }
 
   const badges =
     typeof product.badges === "object" && product.badges !== null
@@ -48,45 +32,33 @@ export default function Product() {
       : {};
 
   const hasDiscount = !!badges.discount;
-  const showNew = badges.new && !badges.best_seller;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm">
         <Card
-          className="bg-white/10 border border-white/10 rounded-xl"
-          imgSrc={product.image}
+          className="bg-white/10 border border-white/10 rounded-xl overflow-hidden"
         >
-          {/* IMAGE BADGES */}
-          <div className="relative mb-3">
-            <div className="absolute top-2 left-2 flex gap-1">
-              {showNew && <Badge type="new" />}
-              {badges.best_seller && <Badge type="best_seller" />}
-            </div>
+          {/* IMAGE */}
+          <div className="relative">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-72 object-cover"
+            />
 
-            {badges.recommended && (
-              <div className="absolute top-2 right-2">
-                <Badge type="chef_choice" />
-              </div>
-            )}
+            {/* 🔥 REUSABLE BADGES */}
+            <ProductBadges product={product} variant="product" />
           </div>
 
-          {/* DISCOUNT */}
-          {hasDiscount && (
-            <div className="flex gap-2 mb-2">
-              <Badge type="discount" value={badges.discount.value} />
-              <Badge type="limited_deal" />
-            </div>
-          )}
-
           {/* PRICE */}
-          <div className="mt-2">
+          <div className="mt-4">
             {hasDiscount ? (
               <div className="flex gap-2 items-center">
                 <span className="text-red-400 text-xl font-bold">
                   ₹{product.price}
                 </span>
-                <span className="line-through text-gray-400">
+                <span className="line-through text-gray-400 text-sm">
                   ₹{badges.discount.original_price}
                 </span>
               </div>
@@ -97,8 +69,12 @@ export default function Product() {
             )}
           </div>
 
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+          {/* TITLE */}
+          <h1 className="text-2xl font-bold mt-2">
+            {product.name}
+          </h1>
 
+          {/* DESCRIPTION */}
           <p className="text-gray-300 text-sm mt-3">
             {product.description || "No description available."}
           </p>
@@ -114,6 +90,7 @@ export default function Product() {
                 name: product.name,
                 price: product.price,
                 image: product.image,
+                badges: product.badges,
               });
 
               toast.success(`${product.name} added to cart!`);
@@ -123,7 +100,7 @@ export default function Product() {
               }, 500);
             }}
             className={`
-              w-full mt-4 py-2.5 rounded-lg
+              w-full mt-6 py-2.5 rounded-lg
               text-white text-base font-semibold
               flex justify-center items-center gap-2
               transition-all duration-300 ease-in-out

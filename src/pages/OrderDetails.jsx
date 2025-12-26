@@ -3,20 +3,9 @@ import { supabase } from "../lib/supabaseClient";
 import { useParams } from "react-router-dom";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  Button,
-  Toast,
-  ToastToggle,
-} from "flowbite-react";
+import { Toast, ToastToggle } from "flowbite-react";
 
-import {
-  HiOutlineExclamationCircle,
-  HiFire,
-  HiLocationMarker,
-} from "react-icons/hi";
+import { HiFire, HiLocationMarker } from "react-icons/hi";
 import { formatIST } from "../../utils/date";
 
 export default function OrderDetails() {
@@ -437,9 +426,23 @@ export default function OrderDetails() {
                   key={item.id}
                   className="flex justify-between p-3 bg-white/5 rounded-lg"
                 >
-                  <span>
-                    {item.name} × {item.qty}
-                  </span>
+                  <div className="space-y-1">
+                    <p className="font-semibold">
+                      {item.name} × {item.qty}
+                    </p>
+
+                    {item.badges?.discount && (
+                      <div className="flex gap-2">
+                        <span className="px-2 py-1 text-xs bg-red-700 rounded-md">
+                          {item.badges.discount.value}% OFF
+                        </span>
+                        <span className="px-2 py-1 text-xs bg-red-600 rounded-md">
+                          ⏳ Limited Time Deal
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
                   <span>₹{item.price * item.qty}</span>
                 </div>
               ))}

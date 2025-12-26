@@ -307,16 +307,28 @@ export default function AdminOrderDetail() {
                 key={idx}
                 className="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/10"
               >
-                <div>
+                <div className="space-y-1">
                   <p className="font-semibold text-white">{item.name}</p>
                   <p className="text-gray-400 text-sm">Qty: {item.qty}</p>
+
+                  {/* ✅ DISCOUNT BADGES (ADMIN VIEW) */}
+                  {item.badges?.discount && (
+                    <div className="flex gap-2 mt-1">
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-red-700">
+                        {item.badges.discount.value}% OFF
+                      </span>
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-red-600">
+                        ⏳ Limited Time Deal
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <p className="font-bold text-green-400">
                   ₹{item.price * item.qty}
                 </p>
               </div>
-            ))}
+            ))} 
           </div>
 
           <hr className="my-6 border-white/10" />
