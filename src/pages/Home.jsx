@@ -16,12 +16,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
-
       {/* ================= HERO SECTION ================= */}
       <div className="relative isolate w-full min-h-screen flex items-center justify-center px-4">
-
         {/* Gradient Background */}
-        <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 overflow-hidden"
+        >
           <div className="absolute inset-0 bg-linear-to-b from-indigo-900/60 to-gray-900 opacity-90" />
 
           <div
@@ -65,9 +66,7 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((p) => {
             const badges =
-              typeof p.badges === "object" && p.badges !== null
-                ? p.badges
-                : {};
+              typeof p.badges === "object" && p.badges !== null ? p.badges : {};
 
             const hasDiscount = !!badges.discount;
 
@@ -103,16 +102,12 @@ export default function Home() {
                       </span>
                     </div>
                   ) : (
-                    <p className="text-indigo-300 font-medium">
-                      ₹{p.price}
-                    </p>
+                    <p className="text-indigo-300 font-medium">₹{p.price}</p>
                   )}
                 </div>
 
                 {/* NAME */}
-                <h3 className="font-semibold text-lg mt-1">
-                  {p.name}
-                </h3>
+                <h3 className="font-semibold text-lg mt-1">{p.name}</h3>
 
                 {/* DESCRIPTION */}
                 <p className="text-gray-400 text-sm mt-1 line-clamp-2">
@@ -126,4 +121,3 @@ export default function Home() {
     </div>
   );
 }
-
